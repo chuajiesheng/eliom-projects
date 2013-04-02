@@ -81,6 +81,14 @@ module Graffiti_app =
       let application_name = "graffiti"
     end)
 
+(* ----- global element ----- *)
+let canvas_elt =
+    canvas ~a:[a_width width; a_height height]
+      [pcdata "your browser doesn't support canvas"]
+
+let placeholder_elt =
+  p [pcdata "placeholder"]
+
 (* ----- rpc server function ----- *)
 let rpc_key = server_function Json.t<int>
   (fun key -> keyCode := key; console (fun() -> "[rpc_key] keyCode: " ^ (string_of_int !keyCode)); Lwt.return())
@@ -93,10 +101,6 @@ let rpc_log = server_function Json.t<string>
 
 (* ----- communication bus between server & client ----- *)
 let bus = Eliom_bus.create Json.t<drawing>
-
-  let canvas_elt =
-    canvas ~a:[a_width width; a_height height]
-      [pcdata "your browser doesn't support canvas"]
 
 (* ----- image services ----- *)
 let rgb_from_string color = (* color is in format "#rrggbb" *)
@@ -216,6 +220,7 @@ let imageservice =
         (string_of_int(List.length !(%drawing_list)));
 
       let canvas = Eliom_content.Html5.To_dom.of_canvas %canvas_elt in
+      let placeholder = Eliom_content.Html5.To_dom.of_p %placeholder_elt in
 
       let ctx = canvas##getContext (Dom_html._2d_) in
       ctx##lineCap <- Js.string "round";
@@ -282,6 +287,7 @@ let imageservice =
           (fun () -> %rpc_log (string_of_int key));
         Lwt.async
           (fun () -> %rpc_key key);
+        placeholder##innerHTML <- Js.string (string_of_int (key));
         Lwt.return () in
 
       Lwt.async
@@ -326,7 +332,9 @@ let page =
         ]
         ~js:[["graffiti_oclosure.js"]]())
      (body [h1 [pcdata "Graffiti"];
-            div [canvas_elt]]))
+            div [canvas_elt];
+            placeholder_elt;
+           ]))
 
 let main_service =
   Graffiti_app.register_service
