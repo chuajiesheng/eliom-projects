@@ -1,0 +1,30 @@
+opam remove ocamlfind
+brew uninstall opam
+brew uninstall ocaml
+install opam from sh
+remove .opam directory
+opam init --comp 4.00.1
+
+Directories where OCaml will be installed:
+        binaries.................. /Users/chuajiesheng/.opam/4.00.1/bin
+        standard library.......... /Users/chuajiesheng/.opam/4.00.1/lib/ocaml
+        manual pages.............. /Users/chuajiesheng/.opam/4.00.1/man (with extension .1)
+
+eval `opam config env`
+opam install ocamlfind
+
+# install of ocaml lib for ocsigen platform
+opam install react
+opam install ssl
+opam install pcre-ocaml
+opam install ocamlnet
+opam install cryptokit
+opam install ocaml-text
+opam install calendar
+
+opam install lwt
+opam install deriving-ocsigen
+opam install js_of_ocaml
+opam install tyxml
+opam install ocsigenserver
+opam install eliom

@@ -6,4 +6,10 @@
 *.o
 *.cmx
 *.cmxs
-*.cmxa
+*.cmx
+
+*~
+*.depend
+*.client
+*.server
+*.type_mli

@@ -1,0 +1,2 @@
+Read the file via:
+ocaml -I /Users/chuajiesheng/.opam/4.00.1/lib/Sqlite3 sqlite_test.ml 

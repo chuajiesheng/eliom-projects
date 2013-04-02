@@ -1,0 +1,24 @@
+JS_OCAML_HOME=/home/ubuntu/js_of_ocaml-1.3.2
+
+include $(JS_OCAML_HOME)/Makefile.conf
+-include ../../Makefile.local
+
+COMP=$(JS_OCAML_HOME)/compiler/$(COMPILER)
+JSFILES=$(JS_OCAML_HOME)/runtime/runtime.js
+OCAMLC=ocamlfind ocamlc -package lwt -pp "camlp4o $(JS_OCAML_HOME)/lib/syntax/pa_js.cmo" -I $(JS_OCAML_HOME)/lib -g
+STDLIB=$(LIBNAME).cma
+
+$(NAME).js: $(NAME).byte $(COMP) $(JSFILES)
+	$(COMP) -noruntime $(JSFILES) $(NAME).byte $(OPTIONS)
+
+$(NAME).byte: $(OBJS)
+	$(OCAMLC) -linkpkg -o $@ $(STDLIB) $^
+
+%.cmo: %.ml ../../lib/$(STDLIB)
+	$(OCAMLC) -c $<
+
+%.cmi: %.mli ../../lib/$(STDLIB)
+	$(OCAMLC) -c $<
+
+clean::
+	rm -f *.cm[io] $(NAME).byte $(NAME).js

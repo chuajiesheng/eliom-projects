@@ -1,0 +1,2 @@
+Run the database via:
+ocaml -I /Users/chuajiesheng/.opam/4.00.1/lib/Sqlite3 -init sqlite_user.ml
