@@ -287,7 +287,7 @@ let imageservice =
           (fun () -> %rpc_log (string_of_int key));
         Lwt.async
           (fun () -> %rpc_key key);
-        placeholder##innerHTML <- Js.string (string_of_int (key));
+        placeholder##innerHTML <- Js.string ("ascii code: " ^ (string_of_int (key)));
         Lwt.return () in
 
       Lwt.async
@@ -355,11 +355,11 @@ let pop_service =
       ignore { unit {
         Eliom_lib.alert "[pop_service] hello! ;]";
         (* doing thing here cant access server i think *)
-%drawing_list := remove !drawing_list 10;
+        %drawing_list := remove !drawing_list 10;
         (* Stack.clear %drawing_list; *)
-Eliom_lib.alert "[pop_service] drawing_list of length %s"
-  (string_of_int(List.length !(%drawing_list)));
-      }};
+        Eliom_lib.alert "[pop_service] drawing_list of length %s"
+          (string_of_int(List.length !(%drawing_list)));
+        }};
       console (fun() -> "[pop_service] drawing_list of length " ^
         (string_of_int(List.length !drawing_list)));
       create_server();
