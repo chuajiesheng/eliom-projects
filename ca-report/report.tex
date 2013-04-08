@@ -1,10 +1,11 @@
 \documentclass[12pt,fullpage]{article}
 \usepackage[american]{babel}
 \usepackage{csquotes}
-\usepackage[citestyle=apa,backend=bibtex]{biblatex}
+\usepackage[style=apa,backend=biber]{biblatex}
 \DeclareLanguageMapping{american}{american-apa}
 \bibliography{report.bib}
 \linespread{1.5}
+
 
 \begin{document}
 \title{A Web-Based Asynchronous System in F\#}
@@ -74,19 +75,67 @@ The result of the second box would be:
 This wiki-style allow web developer to reuse previously declared HTML
 content quicker. Without having to explicitly modified HTML content.
 
-\subsection{Synchronized of Variables}
-Currently in Eliom
-\subsection{Testing of Web Services}
+\subsection{Integrating Web Services}
+The web become made up of multiple service provided by various providers,
+there is eventually a need to integrate different services so as to provide a
+complete solution for the consumers. Thus it is important to provide a mechanism
+such that other service or application could inter-operate with the services the
+application is providing \parencite{bosworth01}. This could be in the form of
+Extensible Markup Language (XML) or JavaScript Object Notion (JSON)
+\parencite{lin12}. Using JSON, web developer could simply consume the web
+service by obtain the JSON objects and parse the data accordingly. This allow
+more information to be readily available instead of having to request from
+the server.
+
+%% \subsection{Testing of Web Services}
 
 \subsection{Conclusion}
-
-
+Strongly typed web system is still relatively new and there exist a substantial
+amount of improvement to be done. These include area such as libraries, and also
+testing framework. In order for wide adoption of a given platform ability to
+integrate with other platform of services is also key in a cooperative
+environment.
 
 \section{Progress}
+\subsection{Lack of Support in F\#}
+This project originally look into implementing web application in F\# with Pit
+\footnote{Pit is a F\# to JavaScript compiler.} \parencite{giannini12}. But due
+to lack of support and contributor for the project, the project eventually die
+down and the project site\footnote{The project site was at pitfw.org.} was
+shutdown. We begin looking for alternative to a functional web framework and
+eventually decide to work on the project using Ocsigen framework using OCaml
+language. OCaml being a more mature provide more support due to better
+maintenance. Nevertheless, together the above mention improvement, we would
+mention addition improvement from the experience we gain while implementing
+a sample application. The graffiti allows players to draw onto onto the HTML
+canvas while others play forms updates with the new shapes.
+
 \subsection{Graffiti Web Application}
+
+\subsection{Synchronizing of Variables}
+Currently in Eliom, synchronizing server-side and client-side variable require
+explicit server function declaration such as:
+\begin{verbatim}
+let rpc_put_key = server_function Json.t<int>
+  (fun key -> key := new_key; Lwt.return())
+\end{verbatim}
+This function explicitly updates the key value on the server side. While to
+get the key value from the server from the client require another function
+such as:
+\begin{verbatim}
+let rpc_get_key = server_function Json.t<unit>
+  (fun () -> Lwt.return key)
+\end{verbatim}
+As the number of variable shared increase, the number of function needed to
+synchronize the variable will increase twice\footnote{For every variable,
+one function is needed to update the server-side variable while another to
+retrieve the variable.} the speed. A simple generic function which could
+be use to update and retrieve the variable would be helpful in reducing
+the duplication of code over the application.
+
 
 \subsection{Form-based Interaction}
 \section{Research Plan}
-\section{References}
+
 \printbibliography
 \end{document}
