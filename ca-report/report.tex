@@ -1,156 +1,73 @@
 \documentclass[12pt,fullpage]{article}
-\usepackage[citestyle=numeric,backend=bibtex]{biblatex}
-\addbibresource{report.bib}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[citestyle=apa,backend=bibtex]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\bibliography{report.bib}
 \linespread{1.5}
+
 \begin{document}
-\title{A Web-Based Asynchronous System in F#}
+\title{A Web-Based Asynchronous System in F\#}
 \author{Chua Jie Sheng}
 \maketitle
 
-\section{Introduction}
-\subsection{Project Objectives}
-
+\section{Project Objectives}
 The objective of this project is to explore to use of a high-level functional
 language for web development. Currently web system is organized in three tiers,
 namely web interface, server and databases. Each of this component runs on a
-separate computer. This result in impedance mismatch problem when the data types
-are not strictly matched \cite{links-fmco06}. In addition, web programming have
-been constrained by the protocols, standards and browsers implementation. This
-restrict the
+separate computer. Implementing a web application would thus need to master a
+minimum of three different languages. Using multiple language to implement a
+single platform would easily result in impedance mismatch problem when the data
+types are not strictly matched \parencite{links-fmco06}. In addition, web programming
+have been constrained by the protocols, standards and browsers implementation.
+This restricts the evolution of web technology beside higher adoption of
+JavaScript implementation \parencite{p311-balat}. We explore using a high-level
+functional language to allow the implementation to exist on a single language,
+which in turns allow us to ensure strong correctness of implementation
+via type checking provided by functional languages.
 
-objective
-1. use of high-level language for web development
-2. use of statically type to ensure a strong correctness
-3. client, server, and database in a single code
-4. functional language provide a elegent solution to statelessness
-5. evolution of web technology restricted beside higher adoption of javascript
-
-problem
-1. sending both get and post method in the same form
-
-
-Functional language such as F# and
-OCaml provides a strict, statically-typed
-
-The objective of this project is to implement language extensions for
-the OCaml language \cite{ocaml-website}. OCaml is a strict,
-statically-typed, functional programming language. It also offers a type
-inference system based on the Hindley-Milner type system. Despite
-having such a rich type system, the language has many drawbacks such
-as the lack of generic printers \cite{minsky08} , absence of a good
-debugging tool and a cumbersome syntax to do lazy evaluation. The
-project aims to fix these three problems by writing language
-extensions. The implementation of the language extensions uses camlp4
-\cite{camlp4-website} , the Caml Pre-Processor-Pretty-Printer. It
-provides an interface to the abstract syntax trees of OCaml
-programs, allowing programmers to do some form of meta-programming.
-An example of an extension writen using camlp4 is Jane Street's
-sexplib \cite{sexplib-website} . This library converts OCaml types
-into s-expressions for easy parsing and pretty-printing. Another
-extension writen in camlp4 is Martin Jambon's pa\_finally
-\cite{pa-finally-website} . It adds Java's try...finally into the language.
-
-\subsubsection{Improving OCaml Deriving}
-
-The OCaml deriving library borrows a key concept from the programming
-language Haskell \cite{haskell98}. It allows generic functions to be
-defined on algebraic data types like this piece of haskell code:
-\begin{verbatim}
-data List a = Nil | Cons a (List a)
-  deriving (Show)
-
-myLst = Cons 1 (Cons 2 Nil)
-
-show myLst
-\end{verbatim}
-The above code makes \texttt{List} an instance of the \texttt{Show}
-type class \cite{Hall96typeclasses} . It basically defines the
-\texttt{show} function for the \texttt{List} data type. When it is
-called with the \texttt{show} function, it simply converts the data
-type into its string representation. Although OCaml do not have type
-classes, the deriving library uses OCaml modules to mimic type
-classes. The above example would look like this in OCaml when used
-with the deriving library:
-\begin{verbatim}
-type 'a my_list = Nil | Cons of 'a * 'a my_list
-  deriving (Show)
-
-lst = Cons (1, Cons (2, Nil))
-
-Show.show<int my_list> lst
-\end{verbatim}
-The
-\subsubsection{Debug Annotations}
-
-An usual style of debugging is to use ``printf'' debugging. Users of
-such style would usually place print statements before the function
-body and at the end of the function body to observe how variables
-change during the execution of the function. Although OCaml's
-interpreter comes with a trace directive, it has a couple of
-flaws. The printing of variables is not flexible enough to be
-customized and functions that uses it has to be loaded into the
-interpreter. This means that many functions cannot be debugged using
-this trace directive. A workaround is to implement user defined
-trace functions with function signatures like these:
-\begin{verbatim}
-Debug.ho_1 : string -> ('a -> string) ('b -> string) ('a -> 'b) 'a -> 'b
-
-Debug.ho_2 : string -> ('a -> string) ('b -> string) ('c -> string)
-('a -> 'b -> 'c) -> 'a -> 'b -> 'c
-\end{verbatim}
-\texttt{Debug.ho\_1} is for tracing functions that take one parameter.
-It takes a string that identifies the function that the programmer is
-tracing, functions that converts the input and output to string, the
-function itself and lastly the input. \texttt{Debug.ho\_2} is to trace
-functions that take two parameters. It is similar to
-\texttt{Debug.ho\_1} in its usage. To use it, the programmer has to
-shadow the function so that the debug function is called:
-\begin{verbatim}
-open Debug
-
-let rec fact (n:int) : int =
-  if n = 0 then
-    1
-  else n * fact (n-1)
-
-let fact n = Debug.ho_1 "fact" string_of_int string_of_int fact n
-\end{verbatim}
-It is clear that when debugging a function that takes a lot of
-parameters, it can become very tiresome to write. The situation is
-made worst when the inputs or outputs consist of ADTs that are defined
-by the programmer and he or she will have to write string conversion
-functions for them. The language extension aims to fix this by
-generating the function that calls the tracing function. A proposed
-extension looks something like this:
-\begin{verbatim}
-open Debug
-
-debug.(
-let rec fact (n:int) : int =
-  if n = 0 then
-    1
-  else n * fact (n-1)
-)
-\end{verbatim}
-To debug the \texttt{fact} function, the programmer simply has to wrap
-the function within parentheses annotated by the \texttt{debug}
-keyword. The pre-processor will call the tracing function on the
-programmer's behalf.
-\subsubsection{Lazy Evaluation}
 \section{Literature Review}
+\subsection{Introduction}
+In the recently years, the web have been moving towards dynamic and interactive
+interaction instead of being data-centric, while the methods to create web
+application remains vastly the same. There have many attempt to adopt functional
+language for web programming but most see limited adoption. These include
+Hop \parencite{p1001-serran}, Links \parencite{links-fmco06}, Ocsigen \parencite{p84-balat},
+Pit \parencite{paper_4}, SML.NET \parencite{p53-Benton}.
 
-Review these papers:
+\subsection{Form-based Interaction}
+In web application, using forms to request information from users is a trivial
+task, client-side developer develops the user interface contain the form widget
+while server-side developer develops the services to receive the information.
+More often than not, forms developed by client-side developer does not present
+all information required by the services, this result in a problem called as
+impedance mismatch \parencite{links-fmco06}.
+\\
+As web application are constrained by the technology and implementation of web
+browser and web server, the use of HTTP request method are restricted to one per
+form\footnote{With the exception that web developer explicitly design the
+page to handle individual form submission manually with different or multiple
+Ajax calls.}. This result in restriction in the types of data sent to the server.
+When using GET, the information sent is explicitly shown to the user which could
+register a bookmark to return to the same page. But this is different from POST
+request, where data send is not shown to the user and a bookmark to a POST
+services bring you to a dead page \parecite{p84-balat}.
 
-\begin{itemize}
-\item Jeremy Yallop's deriving paper \cite{yallop07}
-\item Template meta-programming in Haskell \cite{sheard02}
-\item Scrap your boilerplate \cite{lammel03}
-\end{itemize}
+\subsection{Box Notion}
+
+
+\subsection{Testing of Web Services}
+
+\subsection{}
+\subsection{Conclusion}
+1. sending both get and post method in the same form p84-balat
+
+
 \section{Progress}
-\subsection{Debug Annotations}
+\subsection{Graffiti Web Application}
 
-\subsection{OCaml Deriving}
-\subsection{Lazy Evaluation}
+\subsection{Form-based Interaction}
 \section{Research Plan}
+\section{References}
 \printbibliography
 \end{document}
