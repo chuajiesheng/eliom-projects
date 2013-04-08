@@ -18,10 +18,10 @@ namely web interface, server and databases. Each of this component runs on a
 separate computer. Implementing a web application would thus need to master a
 minimum of three different languages. Using multiple language to implement a
 single platform would easily result in impedance mismatch problem when the data
-types are not strictly matched \parencite{links-fmco06}. In addition, web programming
+types are not strictly matched \parencite{links06}. In addition, web programming
 have been constrained by the protocols, standards and browsers implementation.
 This restricts the evolution of web technology beside higher adoption of
-JavaScript implementation \parencite{p311-balat}. We explore using a high-level
+JavaScript implementation \parencite{balat09}. We explore using a high-level
 functional language to allow the implementation to exist on a single language,
 which in turns allow us to ensure strong correctness of implementation
 via type checking provided by functional languages.
@@ -32,8 +32,8 @@ In the recently years, the web have been moving towards dynamic and interactive
 interaction instead of being data-centric, while the methods to create web
 application remains vastly the same. There have many attempt to adopt functional
 language for web programming but most see limited adoption. These include
-Hop \parencite{p1001-serran}, Links \parencite{links-fmco06}, Ocsigen \parencite{p84-balat},
-Pit \parencite{paper_4}, SML.NET \parencite{p53-Benton}.
+Hop \parencite{serrano07}, Links \parencite{links06}, Ocsigen \parencite{balat06},
+Pit \parencite{paper4}, SML.NET \parencite{benton04}.
 
 \subsection{Form-based Interaction}
 In web application, using forms to request information from users is a trivial
@@ -41,7 +41,7 @@ task, client-side developer develops the user interface contain the form widget
 while server-side developer develops the services to receive the information.
 More often than not, forms developed by client-side developer does not present
 all information required by the services, this result in a problem called as
-impedance mismatch \parencite{links-fmco06}.
+impedance mismatch \parencite{links06}.
 \\
 As web application are constrained by the technology and implementation of web
 browser and web server, the use of HTTP request method are restricted to one per
@@ -51,16 +51,35 @@ Ajax calls.}. This result in restriction in the types of data sent to the server
 When using GET, the information sent is explicitly shown to the user which could
 register a bookmark to return to the same page. But this is different from POST
 request, where data send is not shown to the user and a bookmark to a POST
-services bring you to a dead page \parecite{p84-balat}.
+services bring you to a dead page \parencite{balat06}.
 
 \subsection{Box Notion}
+Currently implemented in Ocsigen, web developer could declare fragment of HTML
+codes which could be reused. But this restricted to predefined HTML fragment
+but not content within the HTML. Alternatively in Ocsimore, the use of box
+notion allows the uses of special syntax to reuse previously declared content,
+with finer control \parencite{balat09}.
+\\* Box 1:
+\begin{verbatim}
+The text at the end is in bold: **<<content>>**.
+\end{verbatim}
+Box 2:
+\begin{verbatim}
+Let us call 1: <<wikibox box='1' | In bold >>
+\end{verbatim}
+The result of the second box would be:
+\\*
+\centerline{``Let us call 1: The text at the end is in bold: {\bf In Bold}.''}
+\\*
+This wiki-style allow web developer to reuse previously declared HTML
+content quicker. Without having to explicitly modified HTML content.
 
-
+\subsection{Synchronized of Variables}
+Currently in Eliom
 \subsection{Testing of Web Services}
 
-\subsection{}
 \subsection{Conclusion}
-1. sending both get and post method in the same form p84-balat
+
 
 
 \section{Progress}
