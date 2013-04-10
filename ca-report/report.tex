@@ -12,55 +12,61 @@
 \author{Chua Jie Sheng}
 \maketitle
 
-\section{Project Objectives}
-The objective of this project is to explore to use of a high-level functional
+\section{Project Objective}
+The objective of this project is to explore the use of a high-level functional
 language for web development. Currently web system is organized in three tiers,
 namely web interface, server and databases. Each of this component runs on a
-separate computer. Implementing a web application would thus need to master a
-minimum of three different languages. Using multiple language to implement a
-single platform would easily result in impedance mismatch problem when the data
+separate computer. Implementing a web application would thus require one to master a
+minimum of three different languages. Using multiple languages to implement a
+single application could easily result in impedance mismatch problem when the data
 types are not strictly matched \parencite{links06}. In addition, web programming
-have been constrained by the protocols, standards and browsers implementation.
-This restricts the evolution of web technology beside higher adoption of
+has been constrained by the protocol, standard and browser implementation.
+This restricts the evolution of web technology beside to higher adoption of
 JavaScript implementation \parencite{balat09}. We explore using a high-level
-functional language to allow the implementation to exist on a single language,
-which in turns allow us to ensure strong correctness of implementation
+functional language to allow the implementation to be accomplished using a single language,
+which in turn could allow us to ensure a higher level of correctness in the implementation
 via type checking provided by functional languages.
 
 \section{Literature Review}
 \subsection{Introduction}
-In the recently years, the web have been moving towards dynamic and interactive
-interaction instead of being data-centric, while the methods to create web
-application remains vastly the same. There have many attempt to adopt functional
-language for web programming but most see limited adoption. These include
+In the recent years, the web has been moving towards dynamic and interactive
+interaction from the usual data-centric approach, while the methods to create web
+application remains largely the same. There have been many attempt to adopt functional
+languages for web programming. However, most see limited adoption. Among these attempts are
 Hop \parencite{serrano07}, Links \parencite{links06}, Ocsigen \parencite{balat06},
 Pit \parencite{paper4}, SML.NET \parencite{benton04}.
 
 \subsection{Form-based Interaction}
 In web application, using forms to request information from users is a trivial
-task, client-side developer develops the user interface contain the form widget
+task. Client-side developer develops the user interface containing the form widget
 while server-side developer develops the services to receive the information.
-More often than not, forms developed by client-side developer does not present
-all information required by the services, this result in a problem called as
+More often than not, forms developed by client-side developer do not present
+all information required by the services; this result in a problem known as
 impedance mismatch \parencite{links06}.
 \\
-As web application are constrained by the technology and implementation of web
-browser and web server, the use of HTTP request method are restricted to one per
-form\footnote{With the exception that web developer explicitly design the
+In addition, with the extensive use of cache, certain information may have
+been cached on the web browser. Leveraging on such capabilities would make it
+possible for the form to varies the input parameters and leverage on the cached
+values. This could result in fewer input parameters and thus better
+user interaction experience.
+\\
+As web application is constrained by the technology and the implementation of web
+browser and web server, the use of HTTP request method is restricted to one per
+form\footnote{With the exception that web developers explicitly design the
 page to handle individual form submission manually with different or multiple
-Ajax calls.}. This result in restriction in the types of data sent to the server.
-When using GET, the information sent is explicitly shown to the user which could
-register a bookmark to return to the same page. But this is different from POST
-request, where data send is not shown to the user and a bookmark to a POST
-services bring you to a dead page \parencite{balat06}.
+Ajax calls.}. This results in restriction in the types of data sent to the server.
+When GET request is used, the information sent is explicitly shown to users which could
+register a bookmark to return to the same page. However, this is different from POST
+request, where data sent is not shown to users and a bookmark to a POST
+services bring users to a dead page \parencite{balat06}.
 
 \subsection{Box Notion}
-Currently implemented in Ocsigen, web developer could declare fragment of HTML
-codes which could be reused. But this restricted to predefined HTML fragment
-but not content within the HTML. Alternatively in Ocsimore, the use of box
-notion allows the uses of special syntax to reuse previously declared content,
-with finer control \parencite{balat09}.
-\\* Box 1:
+Currently, with the implementation of Box notion in Ocsigen, web developers
+could declare fragment of HTML codes which could be reused. However, this restricted
+to only predefined HTML fragment and not the content within the HTML. Alternatively in
+Ocsimore, the use of box notion allows the use of special syntax to reuse
+previously declared content with finer control \parencite{balat09}.
+\\ Box 1:
 \begin{verbatim}
 The text at the end is in bold: **<<content>>**.
 \end{verbatim}
@@ -69,73 +75,131 @@ Box 2:
 Let us call 1: <<wikibox box='1' | In bold >>
 \end{verbatim}
 The result of the second box would be:
-\\*
+\\
 \centerline{``Let us call 1: The text at the end is in bold: {\bf In Bold}.''}
-\\*
-This wiki-style allow web developer to reuse previously declared HTML
-content quicker. Without having to explicitly modified HTML content.
+\\
+This wiki-style allows web developers to reuse previously declared HTML
+content more rapidly, without having to explicitly modify the HTML content.
+
+\subsection{Automated User Interface Testing}
+The inspiration from the existing testing framework \parencite{nagarani12}, has
+given rise to an existing need to continuously testing every part of the application to
+prevent regression \parencite{collins12} from entering the system. This
+consequently leads to a need for an automated GUI testing framework that could
+test the application as a whole before deployment.
+\\
+Furthermore, automated testing helps to ensure that any new code added to the
+application works compatibly with other existing functionality. In the event
+where the addition of new code causes the system to break down, the programmer
+should be notified so that the problem could be rectified before the system
+becomes production.
+\\
+Scripted automated testing also allow the possibility of continuous integration
+testing. Continuous integration testing tests for issues with the system after
+integrating a new set of codes. Continuous integration thus allows these issues
+to be discovered as early as possible, thus reducing the testing cost
+\parencite{liu09}.
 
 \subsection{Integrating Web Services}
-The web become made up of multiple service provided by various providers,
+When the web is made up of multiple services provided by various providers,
 there is eventually a need to integrate different services so as to provide a
-complete solution for the consumers. Thus it is important to provide a mechanism
-such that other service or application could inter-operate with the services the
+complete solution for the consumers. Thus, it is important to provide a mechanism
+such that other services or applications could inter-operate with the services the
 application is providing \parencite{bosworth01}. This could be in the form of
 Extensible Markup Language (XML) or JavaScript Object Notion (JSON)
-\parencite{lin12}. Using JSON, web developer could simply consume the web
-service by obtain the JSON objects and parse the data accordingly. This allow
-more information to be readily available instead of having to request from
-the server.
-
-%% \subsection{Testing of Web Services}
+\parencite{lin12}. Using JSON, web developers could simply consume the web
+service by obtaining the JSON objects and parsing the data accordingly. This allows
+more information to be readily available without web developers having to
+request from the server.
 
 \subsection{Conclusion}
-Strongly typed web system is still relatively new and there exist a substantial
-amount of improvement to be done. These include area such as libraries, and also
-testing framework. In order for wide adoption of a given platform ability to
-integrate with other platform of services is also key in a cooperative
-environment.
+Strongly typed web system is still relatively new and there exists a substantial
+room for improvement in many areas such as libraries and testing frameworks. In
+order to increase the adoption of a given platform, the platform needs to
+integrated with other platform to consume and provide services. This
+collaboration is of utmost important in a cooperative environment.
 
 \section{Progress}
 \subsection{Lack of Support in F\#}
-This project originally look into implementing web application in F\# with Pit
-\footnote{Pit is a F\# to JavaScript compiler.} \parencite{giannini12}. But due
-to lack of support and contributor for the project, the project eventually die
-down and the project site\footnote{The project site was at pitfw.org.} was
-shutdown. We begin looking for alternative to a functional web framework and
-eventually decide to work on the project using Ocsigen framework using OCaml
-language. OCaml being a more mature provide more support due to better
-maintenance. Nevertheless, together the above mention improvement, we would
-mention addition improvement from the experience we gain while implementing
-a sample application. The graffiti allows players to draw onto onto the HTML
-canvas while others play forms updates with the new shapes.
+This project originally looks into implementing web application in F\# with Pit
+\footnote{Pit is a F\# to JavaScript compiler.} \parencite{giannini12}. However,
+due to the poor popularity and the lack of support for the project, Pit project eventually
+died down and the project site\footnote{The project site was at pitfw.org.} was
+closed down. Thus, we began to look for an alternative functional web framework and
+eventually decided to work on the project using Ocsigen framework and OCaml
+language. Ocaml, being a more mature lanaguge, provides greater support thanks
+to its larger use base and continuous support from INRIA. Nevertheless, besides
+the above-mentioned improvement, we would like to present additional enhancement
+we have gathered from the experience we have gained when implemented a graffiti application using
+Eliom application server under Ocsigen. In the application, the graffiti allows players to draw
+shapes onto a HTML canvas which could be used to interact with other players
+viewing the same page.
 
 \subsection{Graffiti Web Application}
+This graffiti web application was part of the Ocsigen platform tutorial. However, due
+to the complexity of the platform coupled with the fact that it is mainly
+maintained as a research project, most of the documentations, tutorials and
+examples have been outdated\footnote{I had sent in my graffiti application as a patch
+to update the existing tutorial.}. Therefore, a huge amount of time was devoted
+in the developing the examples from scratch.
+\\
+Eliom, as a platform has a substantially rich set of libraries which are readily
+available for any new developer to adopt \parencite{eliom}. However, despite of
+the great advantage, more improvements could be done to make Eliom even a better
+choice as compared to others. This includes
+various enhancements in the library support for synchronizing server and client-side variables,
+libraries to ensure strongly-typed formed based interaction, automated
+integrated testing and other areas mentioned in the previous section.
 
 \subsection{Synchronizing of Variables}
-Currently in Eliom, synchronizing server-side and client-side variable require
+Currently, in Eliom, synchronizing server-side and client-side variable require
 explicit server function declaration such as:
 \begin{verbatim}
 let rpc_put_key = server_function Json.t<int>
   (fun key -> key := new_key; Lwt.return())
 \end{verbatim}
-This function explicitly updates the key value on the server side. While to
-get the key value from the server from the client require another function
+This function explicitly updates the key value on the server side. On the other
+hand, getting the key value from the server from the client require another function
 such as:
 \begin{verbatim}
 let rpc_get_key = server_function Json.t<unit>
   (fun () -> Lwt.return key)
 \end{verbatim}
-As the number of variable shared increase, the number of function needed to
-synchronize the variable will increase twice\footnote{For every variable,
+As the number of variables shared increases, the number of functions needed to
+synchronize the variables will increase twice\footnote{For every variable,
 one function is needed to update the server-side variable while another to
 retrieve the variable.} the speed. A simple generic function which could
-be use to update and retrieve the variable would be helpful in reducing
+be used to update and retrieves the variable would be helpful in reducing
 the duplication of code over the application.
+\\
+Using the understanding of the synchronizing mechanism, we could adopt this
+in providing a dynamic form-based interaction. This interaction technique
+would allow the form to be updated with the correct values when the users
+modify some existing properties.
 
-
-\subsection{Form-based Interaction}
 \section{Research Plan}
+For the remaining months, I intend to implement a seminar web application with
+a initial focus on providing a strongly-typed form-based interaction method and
+library. Using this library, the objective is to create strongly-typed forms
+and provide the developers with the tool which enables them to maintain the type
+safety.
+\\
+Furthermore, with the experience acquired from the implementation of a
+form-interaction library, I intend to implement the box notion mentioned in the
+previous section. The use of the box notion in the seminar web application is to
+encourage the dynamic reuse of code fragment throughout the code base. In
+addition, in the process of implementing the seminar web application, I intent
+to adopt a test oriented design methodology in which I aim to achieve high
+testing metrics for the overall code base.
+\\
+This implementation strategy aims to prefect my skill in unit testing so as to
+implement a method to test the web application as a whole. Using the experience
+obtained from unit testing, I wish to develop methods to validate HTTP response
+and HTTP responses pages in the future. A good method to validate the response
+pages would first retrieve the pages, then parsing the pages into OCaml data
+types which could be used to validate the response's page structure, types and
+values. This method could also be used to test the system as a whole including
+the database.
 
 \printbibliography
 \end{document}
