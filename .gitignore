@@ -8,6 +8,10 @@
 *.cmxs
 *.cmx
 
+*/local/*
+*/_deps/*
+*/_client/*
+*/_server/*
 *~
 *.DS_STORE
 *.depend
