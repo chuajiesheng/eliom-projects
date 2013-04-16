@@ -12,11 +12,11 @@ let user_service =
 let connection_service =
   Eliom_service.post_service
     ~fallback:main_service
-    ~post_params:Eliom_parameter.(string "name" ** string "password")
+    ~post_params:Eliom_parameter.(string "name" ** int "password")
     ()
 
 (* User names and passwords: *)
-let users = ref [("Calvin", "123"); ("Hobbes", "456")]
+let users = ref [("Calvin", 123); ("Hobbes", 456)]
 
 let user_links () =
   ul (List.map (fun (name, _) ->
@@ -33,7 +33,7 @@ let connection_box () =
              ~name:name1 ();
            br ();
            label ~a:[a_for name2] [pcdata "password: "];
-           string_input ~input_type:`Password
+           int_input ~input_type:`Password
              ~name:name2 ();
            br ();
            label ~a:[a_for name2] [pcdata "remark: "];
