@@ -1,9 +1,9 @@
 
 #----------------------------------------------------------------------
-#           SETTINGS FOR THE ELIOM PROJECT basic-form
+#           SETTINGS FOR THE ELIOM PROJECT basic_form
 #----------------------------------------------------------------------
 
-PROJECT_NAME := basic-form
+PROJECT_NAME := basic_form
 
 # Source files for the server
 SERVER_FILES := $(wildcard *.eliomi *.eliom)
