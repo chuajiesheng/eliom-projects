@@ -9,6 +9,7 @@
 *.cmx
 
 *~
+*.DS_STORE
 *.depend
 *.client
 *.server
