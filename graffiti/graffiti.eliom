@@ -91,10 +91,16 @@ let placeholder_elt =
 
 (* ----- rpc server function ----- *)
 let rpc_key = server_function Json.t<int>
-  (fun key -> keyCode := key; console (fun() -> "[rpc_key] keyCode: " ^ (string_of_int !keyCode)); Lwt.return())
+  (fun key -> keyCode := key;
+    console (fun() -> "[rpc_key] keyCode: " ^ (string_of_int !keyCode));
+    Lwt.return()
+  )
 
 let rpc_get_key = server_function Json.t<unit>
-  (fun () -> console(fun() -> "[rpc_get_key] get keyCode: " ^ (string_of_int !keyCode)); Lwt.return keyCode)
+  (fun () ->
+    console(fun() -> "[rpc_get_key] get keyCode: " ^ (string_of_int !keyCode));
+    Lwt.return keyCode
+  )
 
 let rpc_log = server_function Json.t<string>
   (fun str -> console (fun () -> "[client] " ^ str); Lwt.return ())
