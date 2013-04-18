@@ -36,7 +36,7 @@ let connection_box () =
            int_input ~input_type:`Password
              ~name:name2 ();
            br ();
-           label ~a:[a_for name2] [pcdata "remark: "];
+           label ~a:[a_for name2] [pcdata "domain: "];
            string_input ~input_type:`Text
              ();
            br ();
