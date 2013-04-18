@@ -293,7 +293,7 @@ let imageservice =
           (fun () -> %rpc_log (string_of_int key));
         Lwt.async
           (fun () -> %rpc_key key);
-        placeholder##innerHTML <- Js.string ("ascii code: " ^ (string_of_int (key)));
+        placeholder##innerHTML <- Js.string ("ascii char: " ^ (String.make 1 (char_of_int (key))) );
         Lwt.return () in
 
       Lwt.async
