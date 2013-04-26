@@ -1,5 +1,4 @@
 open Eliom_content.Html5.D
-
 let main_service =
   Eliom_service.service
     ~path:[""]
