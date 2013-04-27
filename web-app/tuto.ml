@@ -71,10 +71,13 @@ Eliom_registration.Html5.register
 Eliom_registration.Html5.register
     ~service:user_service
     (fun name () ->
+      lwt cf = connection_box () in
       Lwt.return
         (html (head (title (pcdata name)) [])
               (body [h1 [pcdata name];
-                     p [a ~service:main_service [pcdata "Home"] ()]])));
+                     cf;
+                     p [a
+                          ~service:main_service [pcdata "Home"] ()]])));
 
 Eliom_registration.Html5.register
     ~service:old_connection_service

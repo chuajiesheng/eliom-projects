@@ -16,7 +16,6 @@ let old_connection_service =
     ()
 
 let connection_service =
-  Eliom_service.post_service
-    ~fallback:main_service
+  Eliom_service.post_coservice'
     ~post_params:Eliom_parameter.(string "name" ** string "password")
     ()
