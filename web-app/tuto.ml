@@ -25,11 +25,17 @@ let check_pwd name pwd =
   try List.assoc name !users = pwd with Not_found -> false
 
 (* ----- HTML ----- *)
+let disconnect_box () =
+  post_form disconnection_service
+    (fun _ -> [p [string_input
+                    ~input_type:`Submit ~value:"Log out" ()]]) () in
+
 let connection_box () =
   lwt u = Eliom_reference.get username in
   Lwt.return
     (match u with
-    | Some s -> p [pcdata "You are connected as "; pcdata s]
+    | Some s -> div [p [pcdata "You are connected as "; pcdata s; ];
+                       disconnect_box ()]
     | None ->
         post_form ~service:connection_service
           (fun (name1, name2) ->
@@ -100,3 +106,7 @@ Eliom_registration.Action.register
       if check_pwd name password
       then Eliom_reference.set username (Some name)
       else Lwt.return ());
+
+Eliom_registration.Action.register
+    ~service:disconnection_service
+    (fun () () -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ());

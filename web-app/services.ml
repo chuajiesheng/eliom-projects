@@ -19,3 +19,6 @@ let connection_service =
   Eliom_service.post_coservice'
     ~post_params:Eliom_parameter.(string "name" ** string "password")
     ()
+
+let disconnection_service =
+  Eliom_service.post_coservice' ~post_params:Eliom_parameter.unit ()
