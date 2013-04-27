@@ -22,3 +22,11 @@ let connection_service =
 
 let disconnection_service =
   Eliom_service.post_coservice' ~post_params:Eliom_parameter.unit ()
+
+let new_user_form_service =
+  Eliom_service.service ~path:["registration"] ~get_params:Eliom_parameter.unit ()
+
+let create_account_service =
+  Eliom_service.post_coservice
+    ~fallback:main_service
+    ~post_params:Eliom_parameter.(string "name" ** string "password") ()

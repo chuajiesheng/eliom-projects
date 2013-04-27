@@ -37,7 +37,7 @@ let connection_box () =
     | Some s -> div [p [pcdata "You are connected as "; pcdata s; ];
                        disconnect_box ()]
     | None ->
-        post_form ~service:connection_service
+        div [post_form ~service:connection_service
           (fun (name1, name2) ->
             [fieldset
                    [label ~a:[a_for name1] [pcdata "login: "];
@@ -50,7 +50,23 @@ let connection_box () =
                 br ();
                 string_input ~input_type:`Submit
                                                 ~value:"Connect" ()
-                   ]]) ()) in
+                   ]]) ();
+             p [a new_user_form_service
+                  [pcdata "Create an account"] ()]
+            ]) in
+
+let account_form =
+  post_form ~service:create_account_service
+    (fun (name1, name2) ->
+      [fieldset
+         [label ~a:[a_for name1] [pcdata "login: "];
+          string_input ~input_type:`Text ~name:name1 ();
+          br ();
+          label ~a:[a_for name2] [pcdata "password: "];
+          string_input ~input_type:`Password ~name:name2 ();
+          br ();
+          string_input ~input_type:`Submit ~value:"Connect" ()
+         ]]) () in
 
 (* ----- Service Registration ----- *)
 Eliom_registration.Html5.register
@@ -110,3 +126,18 @@ Eliom_registration.Action.register
 Eliom_registration.Action.register
     ~service:disconnection_service
     (fun () () -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ());
+
+Eliom_registration.Html5.register
+    ~service:new_user_form_service
+    (fun () () ->
+      Lwt.return
+        (html (head (title (pcdata "")) [])
+              (body [h1 [pcdata "Create an account"];
+                     account_form;
+                    ])));
+
+Eliom_registration.Action.register
+    ~service:create_account_service
+    (fun () (name, pwd) ->
+      users := (name, pwd)::!users;
+      Lwt.return ());
