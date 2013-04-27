@@ -56,7 +56,8 @@ let connection_box () =
             ]) in
 
 let account_form =
-  post_form ~service:create_account_service
+  (* post_form ~service:create_account_service *)
+  post_form ~service:account_confirmation_service
     (fun (name1, name2) ->
       [fieldset
          [label ~a:[a_for name1] [pcdata "login: "];
@@ -141,3 +142,25 @@ Eliom_registration.Action.register
     (fun () (name, pwd) ->
       users := (name, pwd)::!users;
       Lwt.return ());
+
+Eliom_registration.Html5.register
+  ~service:account_confirmation_service
+  (fun () (name, pwd) ->
+    let create_account_service =
+      Eliom_registration.Action.register_coservice
+        ~fallback:main_service
+        ~get_params:Eliom_parameter.unit
+        ~timeout:30. (* timeout in seconds *)
+        (fun () () ->
+          users := (name, pwd)::!users;
+          Lwt.return ())
+    in
+    Lwt.return
+      (html
+        (head (title (pcdata "")) [])
+          (body
+            [h1 [pcdata "Confirm account creation for "; pcdata name];
+             p [a ~service:create_account_service [pcdata "Yes"] ();
+                pcdata " ";
+                a ~service:main_service [pcdata "No"] ()]
+            ])));
