@@ -101,16 +101,25 @@ Eliom_registration.Html5.register
                      user_links ()])
          ));
 
-Eliom_registration.Html5.register
-    ~service:user_service
-    (fun name () ->
+(* .send function from the module to send the output *)
+Eliom_registration.Any.register
+  ~service:user_service
+  (fun name () ->
+    if List.exists (fun (n, _) -> n = name) !users
+    then begin
       lwt cf = connection_box () in
-      Lwt.return
+      Eliom_registration.Html5.send
         (html (head (title (pcdata name)) [])
               (body [h1 [pcdata name];
                      cf;
-                     p [a
-                          ~service:main_service [pcdata "Home"] ()]])));
+                     p [a ~service:main_service [pcdata "Home"] ()]]))
+   end else
+      Eliom_registration.Html5.send
+        ~code:404 (* specify the error code but page need to configure *)
+        (html (head (title (pcdata "404")) [])
+              (body [h1 [pcdata "404"];
+                     p [pcdata "That page does not exist"]]))
+    );
 
 Eliom_registration.Html5.register
     ~service:old_connection_service
