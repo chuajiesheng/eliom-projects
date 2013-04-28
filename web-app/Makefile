@@ -12,7 +12,7 @@ include Makefile.options
 ##			      Internals
 
 ## Required binaries
-ELIOMC            := eliomc
+ELIOMC            := eliomc -annot
 ELIOMOPT          := eliomopt
 JS_OF_ELIOM       := js_of_eliom
 ELIOMDEP          := eliomdep

@@ -9,6 +9,10 @@ let user_service =
   Eliom_service.service
     ~path:["users"] ~get_params:Eliom_parameter.(suffix (string "name")) ()
 
+let hacker_service =
+  Eliom_service.service
+    ~path:["hacker"] ~get_params:Eliom_parameter.(suffix (string "name")) ()
+
 let old_connection_service =
   Eliom_service.post_service
     ~fallback:alt_main_service
