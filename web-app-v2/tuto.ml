@@ -94,10 +94,21 @@ let login_box =
    p [a new_user_form_service
          [pcdata "Create an account"] ()]]
 
-let connected_box s =
-  [p [pcdata "You are connected as "; pcdata s; ];
+(*
+   To use this connected_box
+   Declare let cf = div (connected_box username) in
+   And use cf; after that
+*)
+let connected_box username =
+  [p [pcdata "You are connected as "; pcdata username; ];
    disconnect_box ()]
 
+(*
+   To use this connection_box
+   Declare lwt cf = connection_box ()
+   And use cf; after that
+   It uses lwt and thus require the lwt declaration
+ *)
 let connection_box () =
   lwt u = Eliom_reference.get username in
   lwt wp = Eliom_reference.get wrong_pwd in
