@@ -1,3 +1,10 @@
+module Lwt_thread = struct
+  include Lwt
+  include Lwt_chan
+end
+module Lwt_PGOCaml = PGOCaml_generic.Make(Lwt_thread)
+module Lwt_Query = Query.Make_with_Db(Lwt_thread)(Lwt_PGOCaml)
+
 open Eliom_content.Html5.D
 open Lwt
 
@@ -25,45 +32,83 @@ let user_links () =
                         ~service:user_service [pcdata name] name])
                !users)
 
+(* ----- Check Database Function ----- *)
+let get_db : unit -> unit Lwt_PGOCaml.t Lwt.t =
+  let db_handler = ref None in
+  fun () ->
+    match !db_handler with
+    | Some h -> Lwt.return h
+    | None -> Lwt_PGOCaml.connect ~database:"macaque-demo" ()
+
+let table = <:table< users (
+  login text NOT NULL,
+  password text NOT NULL
+) >>
+
+let find name =
+  (get_db () >>= fun dbh ->
+   Lwt_Query.view dbh
+   <:view< {password = user_.password} |
+            user_ in $table$;
+            user_.login = $string:name$; >>)
+
+let insert name pwd =
+  (get_db () >>= fun dbh ->
+  Lwt_Query.query dbh
+  <:insert< $table$ :=
+    { login = $string:name$; password = $string:pwd$; } >>)
+
 let check_pwd name pwd =
+  (get_db () >>= fun dbh ->
+   Lwt_Query.view dbh
+   <:view< {password = user_.password} |
+            user_ in $table$;
+            user_.login = $string:name$;
+    user_.password = $string:pwd$ >>)
+  >|= (function [] -> false | _ -> true)
+
+let check_pwd_old name pwd =
   try List.assoc name !users = pwd with Not_found -> false
 
 (* ----- HTML ----- *)
 let disconnect_box () =
   post_form disconnection_service
     (fun _ -> [p [string_input
-                    ~input_type:`Submit ~value:"Log out" ()]]) () in
+                     ~input_type:`Submit ~value:"Log out" ()]]) ()
+
+let login_box =
+  [post_form ~service:connection_service
+      (fun (name1, name2) ->
+        [fieldset
+            [label ~a:[a_for name1] [pcdata "login: "];
+             string_input ~input_type:`Text
+               ~name:name1 ();
+             br ();
+             label ~a:[a_for name2] [pcdata "password: "];
+             string_input ~input_type:`Password
+               ~name:name2 ();
+             br ();
+             string_input ~input_type:`Submit
+               ~value:"Connect" ()
+            ]]) ();
+   p [a new_user_form_service
+         [pcdata "Create an account"] ()]]
+
+let connected_box s =
+  [p [pcdata "You are connected as "; pcdata s; ];
+   disconnect_box ()]
 
 let connection_box () =
   lwt u = Eliom_reference.get username in
   lwt wp = Eliom_reference.get wrong_pwd in
   Lwt.return
     (match u with
-    | Some s -> div [p [pcdata "You are connected as "; pcdata s; ];
-                       disconnect_box ()]
+    | Some s -> div (connected_box s)
     | None ->
-      let l =
-        [post_form ~service:connection_service
-          (fun (name1, name2) ->
-            [fieldset
-                   [label ~a:[a_for name1] [pcdata "login: "];
-                string_input ~input_type:`Text
-                                                ~name:name1 ();
-                br ();
-                label ~a:[a_for name2] [pcdata "password: "];
-                string_input ~input_type:`Password
-                                                ~name:name2 ();
-                br ();
-                string_input ~input_type:`Submit
-                                                ~value:"Connect" ()
-                   ]]) ();
-             p [a new_user_form_service
-                  [pcdata "Create an account"] ()]]
-      in
       if wp
-      then div ((p [em [pcdata "Wrong user or password"]])::l)
-      else div l
-    ) in
+      then div ((p [em [pcdata "Wrong user or password"]])::login_box)
+      else div login_box
+    )
 
 let account_form =
   (* post_form ~service:create_account_service *)
@@ -76,48 +121,37 @@ let account_form =
            label ~a:[a_for name2] [pcdata "password: "];
            string_input ~input_type:`Password ~name:name2 ();
            br ();
-           string_input ~input_type:`Submit ~value:"Connect" ()
-          ]]) () in
+           string_input ~input_type:`Submit ~value:"Register" ()
+          ]]) ()
 
 (* ----- Service Registration ----- *)
 let authenticated_handler f =
   let handle_anonymous _get _post =
-    let connection_box =
-      let open Eliom_content.Html5.F in
-      post_form ~service:connection_service
-        (fun (name1, name2) ->
-          [fieldset
-              [label ~a:[a_for name1] [pcdata "login: "];
-               string_input ~input_type:`Text ~name:name1 ();
-               br ();
-               label ~a:[a_for name2] [pcdata "password: "];
-               string_input ~input_type:`Password ~name:name2 ();
-               br ();
-               string_input ~input_type:`Submit ~value:"Connect" ()
-              ]]) ()
-    in
+    lwt cf = connection_box () in
     Lwt.return
-      Eliom_content.Html5.F.(html
-                               (head (title (pcdata "")) [])
-                               (body [h1 [pcdata "Please connect"];
-                                      connection_box;]))
+      (html
+         (head (title (pcdata "")) [])
+         (body [h1 [pcdata "Please connect"];
+                cf;]))
   in
   Eliom_tools.wrap_handler
     (fun () -> Eliom_reference.get username)
     handle_anonymous (* Called when [username] is [None] *)
     f (* Called [username] contains something *)
-in
 
-Eliom_registration.Html5.register
+
+let _ = Eliom_registration.Html5.register
   ~service:main_service
   (authenticated_handler
      (fun username _get _post ->
+       let cf = div (connected_box username) in
        Lwt.return
          Eliom_content.Html5.F.(html
                      (head (title (pcdata "")) [])
-                     (body [h1 [pcdata ("Hello " ^ username) ]]))));
+                     (body [h1 [pcdata ("Hello " ^ username) ];
+                           cf;]))))
 
-Eliom_registration.Html5.register
+let _ = Eliom_registration.Html5.register
   ~service:alt_main_service
   (fun () () ->
     lwt cf = connection_box () in
@@ -126,10 +160,10 @@ Eliom_registration.Html5.register
        (body [h1 [pcdata "Hello"];
               cf;
               user_links ()])
-    ));
+    ))
 
 (* .send function from the module to send the output *)
-Eliom_registration.Any.register
+let _ = Eliom_registration.Any.register
   ~service:user_service
   (fun name () ->
     if List.exists (fun (n, _) -> n = name) !users
@@ -146,9 +180,9 @@ Eliom_registration.Any.register
     (html (head (title (pcdata "404")) [])
        (body [h1 [pcdata "404"];
               p [pcdata "That page does not exist"]]))
-    );
+    )
 
-Eliom_registration.Html5.register
+let _ = Eliom_registration.Html5.register
   ~service:hacker_service
   (authenticated_handler
      (fun username _get _post ->
@@ -157,13 +191,13 @@ Eliom_registration.Html5.register
                      (body [h1 [pcdata ("Hello " ^ username)];
                             span [pcdata "_get: "];
                             span [pcdata _get]]
-                     ))));
+                     ))))
 
-Eliom_registration.Html5.register
+let _ = Eliom_registration.Html5.register
   ~service:old_connection_service
   (fun () (name, password) ->
     lwt message =
-      if check_pwd name password
+      if check_pwd_old name password
       then begin
         Eliom_reference.set username (Some name) >>=
           (fun _ -> Lwt.return ("Hello "^name))
@@ -172,35 +206,38 @@ Eliom_registration.Html5.register
   Lwt.return
     (html (head (title (pcdata "")) [])
        (body [h1 [pcdata message];
-              user_links ()])));
+              user_links ()])))
 
-Eliom_registration.Action.register
+let _ = Eliom_registration.Action.register
   ~service:connection_service
   (fun () (name, password) ->
-    if check_pwd name password
-    then Eliom_reference.set username (Some name)
-    else Eliom_reference.set wrong_pwd true);
+    check_pwd name password >>=
+      (function
+      | true -> Eliom_reference.set username (Some name)
+      | false -> Lwt.return ()))
 
-Eliom_registration.Action.register
+let _ = Eliom_registration.Action.register
   ~service:disconnection_service
-  (fun () () -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ());
+  (fun () () -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ())
 
-Eliom_registration.Html5.register
+let _ = Eliom_registration.Html5.register
   ~service:new_user_form_service
   (fun () () ->
     Lwt.return
       (html (head (title (pcdata "")) [])
          (body [h1 [pcdata "Create an account"];
                 account_form;
-               ])));
+               ])))
 
-Eliom_registration.Action.register
+let _ = Eliom_registration.Action.register
   ~service:create_account_service
   (fun () (name, pwd) ->
-    users := (name, pwd)::!users;
-    Lwt.return ());
+    find name >>=
+      (function
+      | [] -> insert name pwd
+      | _ -> Lwt.return ()) )
 
-Eliom_registration.Html5.register
+let _ = Eliom_registration.Html5.register
   ~service:account_confirmation_service
   (fun () (name, pwd) ->
     let create_account_service =
@@ -209,7 +246,8 @@ Eliom_registration.Html5.register
         ~get_params:Eliom_parameter.unit
         ~timeout:30. (* timeout in seconds *)
         (fun () () ->
-          users := (name, pwd)::!users;
+          (* users := (name, pwd)::!users; *)
+          insert name pwd;
           Lwt.return ())
     in
     Lwt.return
@@ -220,4 +258,4 @@ Eliom_registration.Html5.register
              p [a ~service:create_account_service [pcdata "Yes"] ();
                 pcdata " ";
                 a ~service:main_service [pcdata "No"] ()]
-            ])));
+            ])))
